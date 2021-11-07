@@ -95,7 +95,7 @@ Questions
 While [app localization services](https://www.google.com/search?q=localization+service) can work for large scale projects,
 for most small to medium sized apps it doesn't make a lot of sense.
 Unless you're constantly adding content and adding new texts to be translated,
-you would be paying a monthly fee for a service that basically store a list of words.
+you would be paying a monthly fee for a service that basically stores a list of words.
 
 * Why not just use automatic tanslations like Google Translate?
 

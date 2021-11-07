@@ -2,8 +2,8 @@ REM  *****  BASIC  *****
 
 ' Multilanguage localization
 ' --------------------------
-' Manage translations words and phrases in spreadsheet
-' and use this macro to export to different source files
+' Manage translations words and phrases in a LibreOffice Calc spreadsheet
+' and use this LibreOffice macro to export to different source files
 ' * GenerateLocalisationJson - JSON files for javascript
 ' * GenerateLocalisationXcode - XCode Localizable.strings files for iPhone
 ' * GenerateLocalisationEclipse - XML strings.xml files for Android

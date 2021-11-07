@@ -9,7 +9,7 @@ It contains a VBA and LibreOffice script that outputs the .json, .xml, .strings 
 which can be used in JavaScript, Eclipse, XCode or Visual Studio.
 Includes examples for both MS-Excel and LibreOffice Calc.
 
-![preview screenshot](/translations_preview.png?raw=true "Translations spreadsheet preview")
+![preview screenshot](/generate_localization_preview.png?raw=true "Translations spreadsheet preview")
 
 How to use
 ----------
@@ -92,8 +92,10 @@ Questions
 
 * Why use a spreadsheet when there are translation services?
 
-App localization services can work for large scale projects or when you're constantly adding content and new texts to be translated.
-But for most apps it doesn't make a lot of sense to pay a monthly fee for a service that basically manages a list of phrases.
+While [app localization services](https://www.google.com/search?q=localization+service) can work for large scale projects,
+for most small to medium sized apps it doesn't make a lot of sense.
+Unless you're constantly adding content and adding new texts to be translated,
+you would be paying a monthly fee for a service that basically store a list of words.
 
 * Why not just use automatic tanslations like Google Translate?
 
@@ -102,9 +104,10 @@ For text labels and captions in an app the probability of errors is even higher,
 As a real world example of translations errors, in an industrial machinery app the English label `Running time installation` was automatically translated to Russian as basically `"Duration of the theater show"`,
 and in a retail inventory report `Stock shift` was automatically translated to `"Stock shares moved"`.
 
-* Why not just query an online translations api?
+* Why not just query an online translations API at run-time?
 
-Besides the translation errors, this adds a lot of complexity;
+Besides the [translation errors](https://translate.google.com/?sl=fr&tl=en&text=se%20taper%20le%20cul%20par%20terre&op=translate),
+this adds a lot of complexity;
 Do you require the user to be always-online? Do you initially cache the translation results?
 What if the translation server is temporarily offline?
 This requires a disproportionate amount of effort for what is essentially a static list of phrases and words.

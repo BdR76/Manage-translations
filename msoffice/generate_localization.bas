@@ -137,7 +137,7 @@ Sub GenerateLocalisationJson()
                             ' JSON does not support comment lines
                         Else
                             ' language key value
-                            strContents = strContents & vbCrLf & vbTab & vbTab & """" & Replace(strKey, """", """""") & """: """ & Replace(strValue, """", """""") & ""","
+                            strContents = strContents & vbCrLf & vbTab & vbTab & """" & Replace(strKey, """", "\""") & """: """ & Replace(strValue, """", "\""") & ""","
                         End If
                     End If
                 Next y
@@ -146,11 +146,11 @@ Sub GenerateLocalisationJson()
                 strContents = Left(strContents, Len(strContents) - 1)
                 
                 ' close current language, and add to total
-                strContents = strContents & vbCrLf & vbTab & "}" & vbCrLf
-                strContentsAll = strContentsAll & strContents
+                strContents = strContents & vbCrLf & vbTab & "}"
+                strContentsAll = strContentsAll & vbCrLf & strContents & ","
 
                 ' close
-                strContents = "{" & vbCrLf & strContents & "}" & vbCrLf
+                strContents = "{" & vbCrLf & strContents & vbCrLf & "}"
 
                 ' write to single languages file
                 If FileOrDirExists(strFilename) Then
@@ -159,11 +159,14 @@ Sub GenerateLocalisationJson()
                 Call SaveToFile(strFilename, strContents)
 
             Next x
+            
+            ' remove last comma
+            strContentsAll = Left(strContentsAll, Len(strContentsAll) - 1)
  
         End If
         
         ' open and closing brackets
-        strContentsAll = "{" & vbCrLf & strContentsAll & "}" & vbCrLf
+        strContentsAll = "{" & strContentsAll & vbCrLf & "}"
     
         ' write to all languages combined in one file
         strFilename = ActiveWorkbook.path & "\" & OUTPUT_DIR & "all_translations.json" ' example "English.json"

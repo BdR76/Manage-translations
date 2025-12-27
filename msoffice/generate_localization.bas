@@ -690,6 +690,92 @@ Sub GenerateLocalisationVisualStudio()
  
 End Sub
 
+Sub UniqueCharactersFromSelection()
+
+    ' collect all unique characters from the selected cells, for when creating bitmap font
+
+    Dim strFilename As String
+    Dim cell As Range
+    Dim txt As String
+    Dim i As Long, j As Long, k As Long
+    Dim ch As String
+    Dim code As Long
+    Dim codes() As Long
+    Dim codeCount As Long
+    Dim exists As Boolean
+    Dim temp As Long
+    Dim result As String
+    
+    strFilename = ActiveWorkbook.path & "\Unique_characters_output.txt"
+    result = "; Manage-translations, all unique characters in text" & vbCrLf & "; useful when creating bitmap fonts" & vbCrLf & "; Generated on: " & Format(Now(), "dd-mmm-yyyy hh:nn")
+
+    ' Combine all text from selected cells
+    For Each cell In Selection
+        If Not IsEmpty(cell.Value) Then
+            txt = txt & cell.Value
+        End If
+    Next cell
+
+    ' Do it twice
+    For k = 1 To 2
+    
+        ' Add comment line
+        result = result & vbCrLf & vbCrLf
+        If (k = 1) Then result = result & "; unique characters in selection" & vbCrLf
+        If (k = 2) Then result = result & "; unique characters + minial complete a-z A-Z 0-9" & vbCrLf
+        
+        ' Add minial complete a-z A-Z 0-9 characters
+        If (k = 2) Then txt = txt & "1234567890!@#$%^&*()-=+ abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+        ' Loop through each character
+        For i = 1 To Len(txt)
+            code = Asc(Mid(txt, i, 1))
+            exists = False
+            
+            ' Check if this code is already in array
+            For j = 1 To codeCount
+                If codes(j) = code Then
+                    exists = True
+                    Exit For
+                End If
+            Next j
+            
+            ' Add new unique code
+            If Not exists Then
+                codeCount = codeCount + 1
+                ReDim Preserve codes(1 To codeCount)
+                codes(codeCount) = code
+            End If
+        Next i
+    
+        ' --- Sort array (simple Bubble Sort for clarity) ---
+        For i = 1 To codeCount - 1
+            For j = i + 1 To codeCount
+                If codes(i) > codes(j) Then
+                    temp = codes(i)
+                    codes(i) = codes(j)
+                    codes(j) = temp
+                End If
+            Next j
+        Next i
+    
+        ' Add all characters to output string
+        For i = 1 To codeCount
+            result = result & Chr(codes(i))
+        Next i
+    Next k
+    
+    ' overwrite and save file
+    If FileOrDirExists(strFilename) Then
+        Kill strFilename
+    End If
+    Call SaveToFile(strFilename, result)
+
+    ' --- Show result ---
+    MsgBox "Unique sorted characters:" & vbCrLf & result
+
+End Sub
+
 
 ' --------------------------------------
 ' Helper subs and functions

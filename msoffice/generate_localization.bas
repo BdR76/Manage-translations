@@ -173,7 +173,7 @@ Sub GenerateLocalisationJson()
     Dim strContents As String
     Dim strContentsAll As String
  
-    ' create eclipse directory if not exist
+    ' create JSON directory if not exist
     Const OUTPUT_DIR = "json\"
     Call FolderCreate(ActiveWorkbook.path & "\" & OUTPUT_DIR)
     
@@ -269,7 +269,7 @@ Sub GenerateLocalisationXcode()
     Dim strValue As String
     Dim strContents As String
  
-    ' create eclipse directory if not exist
+    ' create XCode directory if not exist
     Const OUTPUT_DIR = "xcode\"
     Call FolderCreate(ActiveWorkbook.path & "\" & OUTPUT_DIR)
 
@@ -314,11 +314,9 @@ Sub GenerateLocalisationXcode()
                         strContents = strContents & strKey & Chr$(10)  ' char 10 = Unix linefeed
                     Else
                         ' language key value
-                        strContents = strContents & """" & Replace(strKey, """", """""") & """ = """ & Replace(strValue, """", """""") & """;" & Chr$(10) ' char 10 = Unix linefeed
+                        strContents = strContents & """" & Replace(strKey, """", "\""") & """ = """ & Replace(strValue, """", "\""") & """;" & Chr$(10) ' char 10 = Unix linefeed
                     End If
                     
-
-
                 Next y
 
                 ' overwrite and save file
@@ -403,12 +401,12 @@ Sub GenerateLocalisationEclipse()
                         strContents = strContents & vbTab & "<!--" & Mid$(strKey, 3) & " -->" & Chr$(10)  ' char 10 = Unix linefeed
                     Else
                         ' language key value
-                        strContents = strContents & vbTab & "<string name=""" & ReplaceXmlKey(strXmlKey) & """>" & ReplaceXmlValue(strValue) & "</string>" & Chr$(10)  ' char 10 = Unix linefeed
+                        strContents = strContents & vbTab & "<string name=""" & ReplaceXmlKey(LCase(strKey)) & """>" & ReplaceXmlValue(strValue) & "</string>" & Chr$(10)  ' char 10 = Unix linefeed
                     End If
                 Next y
 
                 ' close XML
-                strContents = strContents & Chr$(10) & "</resources>"
+                strContents = strContents & "</resources>"
 
                 ' overwrite and save file
                 If FileOrDirExists(strFilename) Then
@@ -783,7 +781,6 @@ End Sub
 Function ReplaceXmlKey(sXmlKey As String) As String
 
     ' prepare xml-safe-key
-    sXmlKey = LCase(sXmlKey)
     sXmlKey = Replace(sXmlKey, "-", "_")
     sXmlKey = Replace(sXmlKey, "/", "_")
     sXmlKey = Replace(sXmlKey, ".", " ")
@@ -808,7 +805,7 @@ Function ReplaceXmlValue(sXmlValue As String) As String
     sXmlValue = Replace(sXmlValue, "<", "&lt;")
     sXmlValue = Replace(sXmlValue, ">", "&gt;")
     sXmlValue = Replace(sXmlValue, """", "&quot;")
-    sXmlValue = Replace(sXmlValue, "'", "\'")
+    sXmlValue = Replace(sXmlValue, "'", "&apos;")
 
     ReplaceXmlValue = sXmlValue
 End Function
@@ -821,4 +818,3 @@ Function FormatCsvValue(sCsvValue As String) As String
 
     FormatCsvValue = sCsvValue
 End Function
-

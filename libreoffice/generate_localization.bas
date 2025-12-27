@@ -12,6 +12,92 @@ REM  *****  BASIC  *****
 ' global String LINE_BREAK = "vbCrLf" ' Chr(13) & Chr(10) gives syntax error
 
 ' --------------------------------------
+' Export CSV files
+' --------------------------------------
+Sub GenerateLocalisationCSV
+
+	Dim OUTPUT_DIR
+	Dim LINE_BREAK
+	Dim HEADER_ROWS
+	LINE_BREAK = Chr(13) & Chr(10) ' doesn't gives syntax error when used here	
+	HEADER_ROWS = 5
+
+	Dim oSheet as Object
+	Dim oCursor
+	Dim col_start
+	Dim row_start
+	Dim col_end
+	Dim row_end
+	Dim strtmp
+
+	Dim sContent as String
+	Dim col as Integer
+	Dim row as Integer
+	Dim str_key as String
+	Dim str_val as String
+
+	' create csv directory if not exist
+	OUTPUT_DIR = "csv\"
+
+	oSheet = ThisComponent.CurrentController.ActiveSheet
+
+	' get cells range, all of sheet contents
+	oCursor = oSheet.createCursor()
+	oCursor.gotoStartOfUsedArea(False)
+	oCursor.gotoEndOfUsedArea(True)
+
+	' determine how many rows and columns
+	col_start = oCursor.RangeAddress.StartColumn
+	row_start = oCursor.RangeAddress.StartRow
+
+	col_end = oCursor.RangeAddress.EndColumn
+	row_end = oCursor.RangeAddress.EndRow
+	
+	' file content
+	sContent = ""
+
+	' output filename (directories will be automatically created if not exist)
+	sFilename = FilePath() & OUTPUT_DIR & "multilanguage.csv"	
+	
+	' build column header
+	sContent = FormatCsvValue("Keys")
+	For col = 1 to col_end
+		' next language, get header language code
+		LanguageCode = LCase(oSheet.getCellByPosition(col, 1).String)
+		sContent = sContent & ",""" & LanguageCode & """"
+	Next col
+
+	' add all text string values
+	For row = HEADER_ROWS to row_end - 1
+	
+		' get key and value
+		str_key = oSheet.getCellByPosition(0, row).String
+
+		If (str_key = "") Then
+			' empty line skip
+		ElseIf (Left(str_key, 2) = "//") Then
+			' comment line skip
+		Else
+			' key value
+			sContent = sContent & LINE_BREAK & FormatCsvValue(str_key)
+
+			' get all text string values
+			For col = 1 to col_end
+				str_val = FormatCsvValue(oSheet.getCellByPosition(col, row).String)
+				sContent = sContent & "," & str_val
+			Next col
+		End If
+	Next row
+	
+	' write to single languages file
+	WriteToTextFile(sFilename, sContent)
+
+	MsgBox ("Translation files for " & col_end & " language created in folder " & OUTPUT_DIR)
+	
+End Sub
+
+
+' --------------------------------------
 ' Export JSON localization files
 ' --------------------------------------
 Sub GenerateLocalisationJson
@@ -90,11 +176,11 @@ Sub GenerateLocalisationJson
 		sContent = Left(sContent, Len(sContent) - 1)
 
 		' close current language, and add to total
-		sContent = sContent & LINE_BREAK & "	}" & LINE_BREAK
-		sContentAll = sContentAll & sContent
+		sContent = sContent & LINE_BREAK & "	}"
+		sContentAll = sContentAll & LINE_BREAK & sContent & ","
 		
 		' open and closing brackets
-		sContent = "{" & LINE_BREAK & sContent & "}" & LINE_BREAK
+		sContent = "{" & sContent & LINE_BREAK & "}" & LINE_BREAK
 
 		' write to single languages file
 		WriteToTextFile(sFilename, sContent)
@@ -103,8 +189,11 @@ Sub GenerateLocalisationJson
 	' write to all languages combined in one file
 	sFilename = FilePath() & OUTPUT_DIR & "all_translations.json"
 
+	' remove last comma
+	sContentAll = Left(sContentAll, Len(sContentAll) - 1)
+
 	' open and closing brackets
-	sContentAll = "{" & LINE_BREAK & sContentAll & "}" & LINE_BREAK
+	sContentAll = "{" & sContentAll & LINE_BREAK & "}"
 
 	WriteToTextFile(sFilename, sContentAll)
 	
@@ -189,7 +278,7 @@ Sub GenerateLocalisationXcode
 				sContent = sContent & str_key & LINE_BREAK  ' char 10 = Unix linefeed
 			Else
 				' language key value
-				sContent = sContent & """" & Replace(str_key, """", """""") & """ = """ & Replace(str_val, """", """""") & """;" & LINE_BREAK ' char 10 = Unix linefeed
+				sContent = sContent & """" & Replace(str_key, """", "\""") & """ = """ & Replace(str_val, """", "\""") & """;" & LINE_BREAK ' char 10 = Unix linefeed
 			End If
 
 		Next row
@@ -285,7 +374,7 @@ Sub GenerateLocalisationEclipse
 					sContent = sContent & "	<!-- " & Trim(Mid(str_key, 3)) & " -->" & LINE_BREAK
 				Else
 					' language key value
-					sContent = sContent & "	<string name=""" & ReplaceXmlKey(str_key) & """>" & ReplaceXmlValue(str_val) & "</string>" &LINE_BREAK
+					sContent = sContent & "	<string name=""" & ReplaceXmlKey(LCase(str_key)) & """>" & ReplaceXmlValue(str_val) & "</string>" &LINE_BREAK
 				End If
 			End If
 
@@ -427,9 +516,19 @@ Private Function ReplaceXmlValue(sXmlValue As String) As String
 	sXmlValue = Replace(sXmlValue, "<", "&lt;")
 	sXmlValue = Replace(sXmlValue, ">", "&gt;")
 	sXmlValue = Replace(sXmlValue, """", "&quot;")
-	sXmlValue = Replace(sXmlValue, "'", "\'")
+	sXmlValue = Replace(sXmlValue, "'", "&apos;")
 
 	ReplaceXmlValue = sXmlValue
+End Function
+
+Private Function FormatCsvValue(sCsvValue As String) As String
+
+    ' csv format
+    sCsvValue = Replace(sCsvValue, """", """""") 'escape double quote
+    sCsvValue = """" & sCsvValue & """"
+
+    FormatCsvValue = sCsvValue
+    
 End Function
 
 Private Function FilePath() As String
@@ -474,4 +573,3 @@ Private Sub WriteToTextFile(sFilename as String, sText as String)
 	' flush buffers ans close
 	oOutText.flush
 End Sub
-

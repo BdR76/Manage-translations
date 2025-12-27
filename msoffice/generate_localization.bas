@@ -83,6 +83,79 @@ Function FileOrDirExists(PathName As String) As Boolean
     On Error GoTo 0
 End Function
 
+Sub GenerateLocalisationCSV()
+ 
+    ' write worksheet translations to CSV files (for example Godot game engine)
+    Dim ws As Worksheet
+    Dim x As Integer
+    Dim y As Integer
+    Dim strFilename As String
+    Dim strKey As String
+    Dim strValue As String
+    Dim strContents As String
+ 
+    ' create csv directory if not exist
+    Const OUTPUT_DIR = "csv\"
+  
+    Call FolderCreate(ActiveWorkbook.path & "\" & OUTPUT_DIR)
+    
+    ' output filename
+    strFilename = ActiveWorkbook.path & "\" & OUTPUT_DIR & "\multilanguage.csv"
+    
+    ' check all worksheets
+    For Each ws In Worksheets
+ 
+        ' only the active worksheet
+        If ws.Name = ActiveSheet.Name Then
+        
+            ' build column header
+            strContents = FormatCsvValue("Keys") & ","
+            For x = 2 To ws.Cells.SpecialCells(xlLastCell).Column
+                strContents = strContents & """" & LCase(ws.Cells(2, x)) & ""","
+            Next 'x
+            ' remove last comma
+            strContents = Left(strContents, Len(strContents) - 1)
+
+            ' add all text string values
+            For y = 6 To ws.Cells.SpecialCells(xlLastCell).Row
+            
+                ' get key and value
+                strKey = ws.Cells(y, 1)
+                    
+                If (strKey = "") Then
+                    ' empty line skip
+                ElseIf (Left$(strKey, 2) = "//") Then
+                    ' comment line skip
+                Else
+                    ' key value
+                    strContents = strContents & vbCrLf & FormatCsvValue(strKey)
+
+                    ' get all text string values
+                    For x = 2 To ws.Cells.SpecialCells(xlLastCell).Column
+                        ' format .csv cell values
+                        strValue = FormatCsvValue(ws.Cells(y, x))
+
+                        ' add to output
+                        strContents = strContents & "," & strValue
+                    Next x
+                End If
+
+            Next y
+
+
+            ' overwrite and save file
+            If FileOrDirExists(strFilename) Then
+                Kill strFilename
+            End If
+            Call SaveToFile(strFilename, strContents)
+
+            MsgBox ("Translation .csv file created in folder " & OUTPUT_DIR)
+        End If
+
+    Next ws
+ 
+End Sub
+
 Sub GenerateLocalisationJson()
  
     ' write worksheet translations to Javascript JSON files
@@ -653,3 +726,13 @@ Function ReplaceXmlValue(sXmlValue As String) As String
 
     ReplaceXmlValue = sXmlValue
 End Function
+
+Function FormatCsvValue(sCsvValue As String) As String
+
+    ' csv format
+    sCsvValue = Replace(sCsvValue, """", """""") 'escape double quote
+    sCsvValue = """" & sCsvValue & """"
+
+    FormatCsvValue = sCsvValue
+End Function
+

@@ -5,7 +5,7 @@ A spreadsheet and macro for app developers to manage translations more easily.
 Keep track of the list of captions and label texts, have translators or your users
 translate the texts, and finally use a macro to generate the source files used in your project.
 
-It contains a VBA and LibreOffice script that outputs the .json, .xml, .strings or .resx files
+It contains a VBA and LibreOffice script that outputs the .csv, .json, .xml, .strings or .resx files
 which can be used in JavaScript, Eclipse, XCode or Visual Studio.
 Includes examples for both MS-Excel and LibreOffice Calc.
 
@@ -19,18 +19,26 @@ rows starting with double slash (//). You can also change or add columns to add
 more translations.
 
 Hire a translator or have your superusers make the necessary translations.
-When all the translations are ready, you can generate the JSON, Eclipse XML files, the
-XCode .strings files or the Visual Studio resource .resx files. Press ALT+F8 and run one
-of the following macro's:
+When all the translations are ready, you can generate the CSV, JSON, Eclipse XML files, the
+XCode .strings files or the Visual Studio resource .resx files.
+In LibreOffice Calc, first go to `Tools > Macros > Edit macros` and `File > Import Basic` and import the .bas file.
+Press ALT+F8 and run one of the following macro's:
 
+	GenerateLocalisationCSV
 	GenerateLocalisationJson
 	GenerateLocalisationEclipse
 	GenerateLocalisationVisualStudio
 	GenerateLocalisationXcode
 
-The macros will create a folder called "json" or "xcode" or "eclipse" or
+The macros will create a folder called "csv" or "json" or "xcode" or "eclipse" or
 "visualstudio" in the same folder where the spreadsheet file is located.
-Visual Studio .resx output is untested, the files might need some tweaking.
+
+	UniqueCharactersFromSelection
+	
+Use this macro by first selecting one or more columns of translated texts
+and then run this macro to output all used letters/characters to a text file.
+This can be useful when [creating a BitmapFont](https://snowb.org/)
+and you only want to include the Glyphs/Characters that are actually used.
 
 Sheet content
 -------------
@@ -49,6 +57,13 @@ The cell colors are for display only, the macro doesn't use them.
 Export preview
 --------------
 The macro can export to different formats, here is a preview of the output.
+
+`CSV` files
+
+	"Keys","en","de","fr"
+	"Start","Start game","Spiel starten","Jouer"
+	"Editor","Editor","Editor","Éditer"
+	..etc
 
 JavaScript `JSON` files
 
@@ -74,19 +89,19 @@ Eclipse `string.xml` files
 		<string name="editor">Editor</string>
 		..etc
 
-Visual Studio `.resx` files export (untested)
+Visual Studio `.resx` files export
 
 	<?xml version="1.0" encoding="utf-8"?>
 	<root>
 		<!-- menu items -->
-		<data name="start">
+		<data name="Start">
 			<value>Start game</value>
 		</data>
-		<data name="editor">
+		<data name="Editor">
 			<value>Editor</value>
 		</data>
 		..etc
-		
+
 Questions
 ---------
 

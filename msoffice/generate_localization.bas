@@ -1,6 +1,6 @@
 Option Explicit
 
-' Multilanguage.xls BdR (c)2012 Free to use
+' Multilanguage.xls by Bas de Reuver (bdr1976@gmail.com) 2012-2025 Free to use
 '
 ' This VBA script writes content of Excel sheet to translation files
 ' which can be used in XCode, Eclipse and Visual Studio.
@@ -9,9 +9,10 @@ Option Explicit
 '
 ' Manage translations words and phrases in spreadsheet
 ' and use this macro to export to different source files
+' * GenerateLocalisationCSV - CSV file for example Godot game engine
 ' * GenerateLocalisationJson - JSON files for javascript
 ' * GenerateLocalisationXcode - XCode Localizable.strings files for iPhone
-' * GenerateLocalisationEclipse - XML strings.xml files for Android
+' * GenerateLocalisationEclipse - XML strings.xml files for Android Studio/Eclipse
 ' * GenerateLocalisationVisualStudio - .resx xml files for Visual Studio
 
 Sub SaveToFile(sFilename As String, sText As String)
@@ -96,7 +97,6 @@ Sub GenerateLocalisationCSV()
  
     ' create csv directory if not exist
     Const OUTPUT_DIR = "csv\"
-  
     Call FolderCreate(ActiveWorkbook.path & "\" & OUTPUT_DIR)
     
     ' output filename
@@ -351,7 +351,7 @@ Sub GenerateLocalisationEclipse()
     Dim strValue As String
     Dim strContents As String
  
-    ' create eclipse directory if not exist
+    ' create Eclipse directory if not exist
     Const OUTPUT_DIR = "eclipse\"
     Call FolderCreate(ActiveWorkbook.path & "\" & OUTPUT_DIR)
  
@@ -442,7 +442,7 @@ Sub GenerateLocalisationVisualStudio()
     Dim strDesignerFileName As String
     Dim strDesignerCode As String
  
-    ' create eclipse directory if not exist
+    ' create Visual Studio directory if not exist
     Const OUTPUT_DIR = "visualstudio\"
     Const OUTPUT_FILENAME = "Strings"
     Call FolderCreate(ActiveWorkbook.path & "\" & OUTPUT_DIR)
@@ -689,9 +689,8 @@ Sub GenerateLocalisationVisualStudio()
 End Sub
 
 Sub UniqueCharactersFromSelection()
-
-    ' collect all unique characters from the selected cells, for when creating bitmap font
-
+    ' Collect all unique characters from the selected cells
+    ' Useful when creating bitmap fonts
     Dim strFilename As String
     Dim cell As Range
     Dim txt As String
@@ -705,7 +704,9 @@ Sub UniqueCharactersFromSelection()
     Dim result As String
     
     strFilename = ActiveWorkbook.path & "\Unique_characters_output.txt"
-    result = "; Manage-translations, all unique characters in text" & vbCrLf & "; useful when creating bitmap fonts" & vbCrLf & "; Generated on: " & Format(Now(), "dd-mmm-yyyy hh:nn")
+    result = "; Manage-translations, all unique characters in text" & vbCrLf & _
+             "; useful when creating bitmap fonts" & vbCrLf & _
+             "; Generated on: " & Format(Now(), "dd-mmm-yyyy hh:nn")
 
     ' Combine all text from selected cells
     For Each cell In Selection
@@ -719,15 +720,18 @@ Sub UniqueCharactersFromSelection()
     
         ' Add comment line
         result = result & vbCrLf & vbCrLf
-        If (k = 1) Then result = result & "; unique characters in selection" & vbCrLf
-        If (k = 2) Then result = result & "; unique characters + minial complete a-z A-Z 0-9" & vbCrLf
-        
-        ' Add minial complete a-z A-Z 0-9 characters
-        If (k = 2) Then txt = txt & "1234567890!@#$%^&*()-=+ abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        If (k = 1) Then
+            result = result & "; unique characters in selection" & vbCrLf
+        Else
+            result = result & "; unique characters + minimal complete a-z A-Z 0-9" & vbCrLf
 
-        ' Loop through each character
+            ' Add minial complete a-z A-Z 0-9 characters
+            txt = txt & "1234567890!@#$%^&*()-=+ abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        End If
+
+        ' Collect unique character codes
         For i = 1 To Len(txt)
-            code = Asc(Mid(txt, i, 1))
+            code = AscW(Mid$(txt, i, 1))
             exists = False
             
             ' Check if this code is already in array
@@ -759,7 +763,7 @@ Sub UniqueCharactersFromSelection()
     
         ' Add all characters to output string
         For i = 1 To codeCount
-            result = result & Chr(codes(i))
+            result = result & ChrW(codes(i))
         Next i
     Next k
     

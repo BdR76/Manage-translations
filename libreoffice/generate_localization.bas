@@ -2,13 +2,13 @@ REM  *****  BASIC  *****
 
 ' Multilanguage.ods by Bas de Reuver (bdr1976@gmail.com) 2012-2025 Free to use
 '
-' This VBA script writes content of Excel sheet to translation files
+' This LibreOffice Basic script writes content of spreadsheet to translation files
 ' which can be used in XCode, Eclipse and Visual Studio.
 ' Left most column contains the translations keys,
 ' each column contains the translation values.
 '
-' Manage translations words and phrases in spreadsheet
-' and use this macro to export to different source files
+' Manage translations words and phrases in a LibreOffice Calc spreadsheet
+' and use this LibreOffice macro to export to different source files
 ' * GenerateLocalisationCSV - CSV file for example Godot game engine
 ' * GenerateLocalisationJson - JSON files for javascript
 ' * GenerateLocalisationXcode - XCode Localizable.strings files for iPhone
